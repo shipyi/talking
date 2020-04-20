@@ -13,6 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+
 public class NIoSocketServer {
     @Test
     public void  run() throws IOException {
@@ -26,10 +27,11 @@ public class NIoSocketServer {
 
         ByteBuffer readBuffer = ByteBuffer.allocate(1024);
         ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
-
+        //向客户端写数据
         writeBuffer.put("helllo i am server".getBytes("UTF-8"));
         writeBuffer.flip();
 
+        //循环处理请求
         while (true) {
             //
             int nReady = selector.select();
@@ -51,13 +53,14 @@ public class NIoSocketServer {
                       int legth = socketChannel.read(readBuffer);
 
                      readBuffer.flip();
-                     System.out.println("recive " + new String(readBuffer.array(),0,legth,"UTF-8"));
+                     System.out.println("recive: " + new String(readBuffer.array(),0,legth,"UTF-8"));
                      selectionKey.interestOps(SelectionKey.OP_WRITE);
                 }
                 else if(selectionKey.isWritable()) {
                      SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
-                     writeBuffer.clear();
+                     //向客户端写数据
                      socketChannel.write(writeBuffer);
+                     writeBuffer.flip();
                      selectionKey.interestOps(SelectionKey.OP_READ);
                 }
             }
